@@ -28,3 +28,12 @@ An AI-powered banking platform built with:
 pip install -r requirements.txt
 uvicorn backend.main:app --reload
 ```
+# Models
+
+Trained ML models are not included because of GitHub size limits.
+
+To generate models:
+
+python ml/train_loan.py
+python ml/train_fraud.py
+python ml/train_credit_score.py
