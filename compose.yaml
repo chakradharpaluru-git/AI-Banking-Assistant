@@ -1,0 +1,63 @@
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ./backend:/app
+      - ./models:/models
+      - ./datasets:/datasets
+
+    depends_on:
+      - postgres
+      - chromadb
+
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/banking_db
+      CHROMA_HOST: chromadb
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    ports:
+      - "8501:8501"
+
+    volumes:
+      - ./frontend:/app
+
+    depends_on:
+      - backend
+
+  postgres:
+    image: postgres:16
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: banking_db
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  chromadb:
+    image: chromadb/chroma
+
+    ports:
+      - "8001:8000"
+
+    volumes:
+      - chroma_data:/data
+
+volumes:
+  postgres_data:
+  chroma_data:

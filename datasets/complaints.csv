@@ -1,0 +1,41 @@
+Complaint,Category
+My credit card payment failed,Credit Card
+Credit card transaction declined,Credit Card
+Unable to activate my credit card,Credit Card
+Credit card limit is too low,Credit Card
+Annual credit card fee charged incorrectly,Credit Card
+Loan application is pending,Loan
+Home loan has not been approved,Loan
+Personal loan EMI is incorrect,Loan
+Loan amount has not been credited,Loan
+Education loan processing is delayed,Loan
+Money deducted twice,Transaction
+Amount debited but receiver did not receive money,Transaction
+Transaction failed but money was deducted,Transaction
+UPI payment failed after deduction,Transaction
+Refund not received after failed transaction,Transaction
+Unable to login to internet banking,Internet Banking
+Internet banking password not working,Internet Banking
+Website is showing server error,Internet Banking
+Net banking session expires frequently,Internet Banking
+Unable to transfer money through internet banking,Internet Banking
+KYC verification failed,KYC
+Unable to upload KYC documents,KYC
+PAN verification failed during KYC,KYC
+Aadhaar verification is pending,KYC
+KYC documents rejected,KYC
+Account is blocked,Account
+Savings account has been frozen,Account
+Unable to access my account,Account
+My account is inactive,Account
+Bank account was closed without notice,Account
+Customer care is not responding,Customer Support
+No response from customer support team,Customer Support
+Support executive disconnected the call,Customer Support
+Complaint has not been resolved,Customer Support
+Waiting for customer support response,Customer Support
+ATM card has been blocked,Account
+Debit card is not working,Account
+Cheque book not received,Account
+Passbook not updated,Account
+Unable to reset account password,Account

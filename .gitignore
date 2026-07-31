@@ -1,0 +1,66 @@
+# Jupyter
+.ipynb_checkpoints/
+notebook/.ipynb_checkpoints/
+
+# Datasets
+datasets/processed/
+datasets/*.npy
+
+# Optional: keep only raw datasets
+datasets/*_cleaned.csv
+
+# Large RAG documents (optional)
+# docs/
+# Environment
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# ChromaDB
+chroma_db/
+rag/vectorstore/
+
+# ML Models
+models/
+*.pkl
+*.joblib
+
+# Notebook generated files
+.ipynb_checkpoints/
+notebook/.ipynb_checkpoints/
+
+# Dataset processed files
+datasets/processed/
+*.npy
+
+# Notebook models
+notebook/models/
+notebook/ml/models/
+# Virtual Environment
+venv/
+
+# ML Models
+models/
+
+# Large datasets
+datasets/*_balanced.csv
+datasets/*_selected_features.csv
+datasets/processed/
+datasets/*.npy
+
+# Chroma Vector Database
+rag/vectorstore/
+
+# SQLite
+*.db
+*.sqlite3
