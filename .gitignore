@@ -5,12 +5,10 @@ notebook/.ipynb_checkpoints/
 # Datasets
 datasets/processed/
 datasets/*.npy
-
-# Optional: keep only raw datasets
 datasets/*_cleaned.csv
+datasets/*_balanced.csv
+datasets/*_selected_features.csv
 
-# Large RAG documents (optional)
-# docs/
 # Environment
 .env
 
@@ -30,37 +28,13 @@ logs/
 chroma_db/
 rag/vectorstore/
 
-# ML Models
-models/
-*.pkl
-*.joblib
-
-# Notebook generated files
-.ipynb_checkpoints/
-notebook/.ipynb_checkpoints/
-
-# Dataset processed files
-datasets/processed/
-*.npy
+# Virtual Environment
+venv/
 
 # Notebook models
 notebook/models/
 notebook/ml/models/
-# Virtual Environment
-venv/
-
-# ML Models
-models/
-
-# Large datasets
-datasets/*_balanced.csv
-datasets/*_selected_features.csv
-datasets/processed/
-datasets/*.npy
-
-# Chroma Vector Database
-rag/vectorstore/
 
 # SQLite
 *.db
-*.sqlite3.env
+*.sqlite3
