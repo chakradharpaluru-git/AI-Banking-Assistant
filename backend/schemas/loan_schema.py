@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from typing import Optional
+
 
 
 class LoanRequest(BaseModel):
@@ -32,6 +34,9 @@ class LoanRequest(BaseModel):
     property_area_urban: int
 
 
+
 class LoanResponse(BaseModel):
 
     prediction: str
+
+    confidence: Optional[float] = None
