@@ -3,7 +3,6 @@ import logging
 
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 
@@ -28,7 +27,6 @@ VECTOR_DB_PATH = os.path.join(
 )
 
 
-
 embeddings = None
 vector_db = None
 retriever = None
@@ -48,20 +46,23 @@ def load_rag_components():
 
     if retriever is None:
 
-
-        logger.info(
-            "Loading RAG Components..."
-        )
+        logger.info("STEP 1: Loading RAG Components")
 
 
         from langchain_huggingface import HuggingFaceEmbeddings
-
         from langchain_chroma import Chroma
-
         from langchain_groq import ChatGroq
-
         from langchain_core.prompts import ChatPromptTemplate
 
+
+
+        # ============================
+        # Load Embedding Model
+        # ============================
+
+        logger.info(
+            "STEP 2: Loading HuggingFace Embeddings"
+        )
 
 
         embeddings = HuggingFaceEmbeddings(
@@ -71,6 +72,20 @@ def load_rag_components():
 
         )
 
+
+        logger.info(
+            "STEP 3: Embeddings Loaded"
+        )
+
+
+
+        # ============================
+        # Load ChromaDB
+        # ============================
+
+        logger.info(
+            f"STEP 4: Loading ChromaDB from {VECTOR_DB_PATH}"
+        )
 
 
         vector_db = Chroma(
@@ -82,6 +97,15 @@ def load_rag_components():
         )
 
 
+        logger.info(
+            "STEP 5: ChromaDB Loaded"
+        )
+
+
+
+        # ============================
+        # Retriever
+        # ============================
 
         retriever = vector_db.as_retriever(
 
@@ -98,6 +122,32 @@ def load_rag_components():
         )
 
 
+        logger.info(
+            "STEP 6: Retriever Loaded"
+        )
+
+
+
+        # ============================
+        # Groq LLM
+        # ============================
+
+        logger.info(
+            "STEP 7: Loading Groq Model"
+        )
+
+
+        groq_key = os.getenv(
+            "GROQ_API_KEY"
+        )
+
+
+        if not groq_key:
+
+            raise Exception(
+                "GROQ_API_KEY missing"
+            )
+
 
         llm = ChatGroq(
 
@@ -105,13 +155,20 @@ def load_rag_components():
 
             temperature=0.2,
 
-            api_key=os.getenv(
-                "GROQ_API_KEY"
-            )
+            api_key=groq_key
 
         )
 
 
+        logger.info(
+            "STEP 8: Groq Loaded"
+        )
+
+
+
+        # ============================
+        # Prompt
+        # ============================
 
         prompt = ChatPromptTemplate.from_template(
 
@@ -139,11 +196,12 @@ Question:
 
 Answer:
 """
+
         )
 
 
         logger.info(
-            "RAG Components Loaded"
+            "STEP 9: RAG Components Loaded Successfully"
         )
 
 
@@ -159,9 +217,7 @@ def policy_rag_agent(question: str):
 
     try:
 
-
         retriever, llm, prompt = load_rag_components()
-
 
 
         logger.info(
@@ -170,8 +226,22 @@ def policy_rag_agent(question: str):
 
 
 
+        # ============================
+        # Retrieve Documents
+        # ============================
+
+        logger.info(
+            "STEP 10: Searching ChromaDB"
+        )
+
+
         docs = retriever.invoke(
             question
+        )
+
+
+        logger.info(
+            f"STEP 11: Documents Found {len(docs)}"
         )
 
 
@@ -179,8 +249,7 @@ def policy_rag_agent(question: str):
         if not docs:
 
             return (
-                "I could not find this information "
-                "in RBI documents."
+                "I could not find this information in RBI documents."
             )
 
 
@@ -196,6 +265,15 @@ def policy_rag_agent(question: str):
 
 
 
+        # ============================
+        # Generate Answer
+        # ============================
+
+        logger.info(
+            "STEP 12: Calling Groq"
+        )
+
+
         messages = prompt.format_messages(
 
             context=context,
@@ -205,9 +283,13 @@ def policy_rag_agent(question: str):
         )
 
 
-
         response = llm.invoke(
             messages
+        )
+
+
+        logger.info(
+            "STEP 13: Answer Generated"
         )
 
 
@@ -219,7 +301,7 @@ def policy_rag_agent(question: str):
 
 
         logger.error(
-            f"RAG Error: {e}"
+            f"RAG ERROR: {e}"
         )
 
 
