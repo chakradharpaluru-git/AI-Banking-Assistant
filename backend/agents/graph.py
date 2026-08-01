@@ -1,55 +1,113 @@
 from langgraph.graph import StateGraph, END
 
-
 from backend.agents.state import AgentState
 
 from backend.agents.supervisor_agent import supervisor_agent
 
-from backend.agents.loan_agent import loan_agent
-from backend.agents.fraud_agent import fraud_agent
-from backend.agents.credit_agent import credit_agent
-from backend.agents.investment_agent import investment_agent
-from backend.agents.support_agent import support_agent
-from backend.agents.kyc_agent import kyc_agent
-from backend.agents.policy_rag_agent import policy_rag_agent
 
 
-
-# --------------------------------------------------
-# Execute Selected Agent
-# --------------------------------------------------
+# ==================================================
+# Execute Selected Agent (Lazy Loading)
+# ==================================================
 
 def execute_agent(state: AgentState):
 
     agent = state["agent_name"]
 
 
+    # -------------------------------
+    # Loan Agent
+    # -------------------------------
+
     if agent == "loan_agent":
+
+        from backend.agents.loan_agent import loan_agent
+
         return loan_agent(state)
 
 
+
+    # -------------------------------
+    # Fraud Agent
+    # -------------------------------
+
     elif agent == "fraud_agent":
+
+        from backend.agents.fraud_agent import fraud_agent
+
         return fraud_agent(state)
 
 
+
+    # -------------------------------
+    # Credit Agent
+    # -------------------------------
+
     elif agent == "credit_agent":
+
+        from backend.agents.credit_agent import credit_agent
+
         return credit_agent(state)
 
 
+
+    # -------------------------------
+    # Investment Agent
+    # -------------------------------
+
     elif agent == "investment_agent":
+
+        from backend.agents.investment_agent import investment_agent
+
         return investment_agent(state)
 
 
+
+    # -------------------------------
+    # Support Agent
+    # -------------------------------
+
     elif agent == "support_agent":
+
+        from backend.agents.support_agent import support_agent
+
         return support_agent(state)
 
 
+
+    # -------------------------------
+    # KYC Agent
+    # -------------------------------
+
     elif agent == "kyc_agent":
+
+        from backend.agents.kyc_agent import kyc_agent
+
         return kyc_agent(state)
 
 
+
+    # -------------------------------
+    # Policy RAG Agent
+    # -------------------------------
+
     elif agent == "policy_rag_agent":
-        return policy_rag_agent(state)
+
+        from backend.agents.policy_rag_agent import policy_rag_agent
+
+
+        answer = policy_rag_agent(
+            state["query"]
+        )
+
+
+        state["response"] = answer
+
+        state["final_answer"] = answer
+
+
+        return state
+
 
 
     else:
@@ -58,16 +116,22 @@ def execute_agent(state: AgentState):
             "Sorry, I couldn't determine the correct banking agent."
         )
 
+        state["final_answer"] = (
+            state["response"]
+        )
+
         return state
 
 
 
 
-# --------------------------------------------------
+# ==================================================
 # Build LangGraph Workflow
-# --------------------------------------------------
+# ==================================================
 
-workflow = StateGraph(AgentState)
+workflow = StateGraph(
+    AgentState
+)
 
 
 
@@ -75,6 +139,7 @@ workflow.add_node(
     "supervisor",
     supervisor_agent
 )
+
 
 
 workflow.add_node(
@@ -90,28 +155,15 @@ workflow.set_entry_point(
 
 
 
-# --------------------------------------------------
-# Router
-# --------------------------------------------------
+
+# ==================================================
+# Routing Logic
+# ==================================================
 
 def router(state: AgentState):
 
-    if state["agent_name"] in [
 
-        "loan_agent",
-        "fraud_agent",
-        "credit_agent",
-        "investment_agent",
-        "support_agent",
-        "kyc_agent",
-        "policy_rag_agent"
-
-    ]:
-
-        return "executor"
-
-
-    return END
+    return "executor"
 
 
 
@@ -124,9 +176,7 @@ workflow.add_conditional_edges(
 
     {
 
-        "executor": "executor",
-
-        END: END
+        "executor": "executor"
 
     }
 
@@ -144,14 +194,17 @@ workflow.add_edge(
 
 
 
+
+# Compile Graph
+
 graph = workflow.compile()
 
 
 
 
-# --------------------------------------------------
+# ==================================================
 # Public Function
-# --------------------------------------------------
+# ==================================================
 
 def run_agent(message: str):
 
@@ -160,14 +213,19 @@ def run_agent(message: str):
 
         "query": message,
 
-        "agent_name": None,
+        "agent_name": "",
 
-        "response": ""
+        "response": "",
+
+        "final_answer": ""
 
     }
 
 
-    result = graph.invoke(state)
+
+    result = graph.invoke(
+        state
+    )
 
 
     return result

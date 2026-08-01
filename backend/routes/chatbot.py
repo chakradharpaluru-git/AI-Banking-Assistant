@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from backend.agents.policy_rag_agent import policy_rag_agent
 from backend.cache.cache_service import CacheService
+
 
 router = APIRouter(
     prefix="/chatbot",
@@ -22,16 +22,18 @@ def chatbot(request: ChatRequest):
 
     try:
 
-        question = request.question.strip()
+        question = request.question.strip().lower()
 
         if not question:
+
             raise HTTPException(
                 status_code=400,
                 detail="Question cannot be empty"
             )
 
+
         # ==========================
-        # Create Redis Cache Key
+        # Redis Cache Key
         # ==========================
 
         cache_key = CacheService.create_key(
@@ -39,11 +41,13 @@ def chatbot(request: ChatRequest):
             question
         )
 
+
         # ==========================
         # Check Redis
         # ==========================
 
         cached = CacheService.get(cache_key)
+
 
         if cached:
 
@@ -59,14 +63,23 @@ def chatbot(request: ChatRequest):
 
             }
 
-        # ==========================
-        # Run RAG Agent
-        # ==========================
 
-        answer = policy_rag_agent(question)
 
         # ==========================
-        # Save Answer
+        # Lazy Load RAG Agent
+        # ==========================
+
+        from backend.agents.policy_rag_agent import policy_rag_agent
+
+
+        answer = policy_rag_agent(
+            question
+        )
+
+
+
+        # ==========================
+        # Save Response in Redis
         # ==========================
 
         CacheService.set(
@@ -74,6 +87,7 @@ def chatbot(request: ChatRequest):
             answer,
             CACHE_EXPIRE
         )
+
 
         return {
 
@@ -86,6 +100,12 @@ def chatbot(request: ChatRequest):
             "response": answer
 
         }
+
+
+    except HTTPException:
+
+        raise
+
 
     except Exception as e:
 

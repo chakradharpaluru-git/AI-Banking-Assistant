@@ -1,9 +1,1 @@
-from . import auth
-from . import loan
-from . import fraud
-from . import credit
-from . import segmentation
-from . import complaint
-from . import chatbot
-from . import agents
-from . import profile
+# routes package
