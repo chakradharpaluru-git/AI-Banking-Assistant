@@ -8,37 +8,36 @@ BASE_DIR = os.path.dirname(
     )
 )
 
-MODEL_PATH = os.path.join(
-    BASE_DIR,
-    "models",
-    "credit_score_model.pkl"
-)
+MODEL_PATH = os.path.join(BASE_DIR, "models", "credit_score_model.pkl")
+SCALER_PATH = os.path.join(BASE_DIR, "models", "credit_scaler.pkl")
+FEATURE_PATH = os.path.join(BASE_DIR, "models", "credit_feature_names.pkl")
+ENCODER_PATH = os.path.join(BASE_DIR, "models", "credit_target_encoder.pkl")
 
-SCALER_PATH = os.path.join(
-    BASE_DIR,
-    "models",
-    "credit_scaler.pkl"
-)
+model = None
+scaler = None
+feature_names = None
+encoder = None
 
-FEATURE_PATH = os.path.join(
-    BASE_DIR,
-    "models",
-    "credit_feature_names.pkl"
-)
+try:
+    model = joblib.load(MODEL_PATH)
+    scaler = joblib.load(SCALER_PATH)
+    feature_names = joblib.load(FEATURE_PATH)
+    encoder = joblib.load(ENCODER_PATH)
+    print("✅ Credit Score Model Loaded")
 
-ENCODER_PATH = os.path.join(
-    BASE_DIR,
-    "models",
-    "credit_target_encoder.pkl"
-)
+except FileNotFoundError:
+    print("⚠️ credit_score_model.pkl not found. Credit Score API disabled.")
 
-model = joblib.load(MODEL_PATH)
-scaler = joblib.load(SCALER_PATH)
-feature_names = joblib.load(FEATURE_PATH)
-encoder = joblib.load(ENCODER_PATH)
+except Exception as e:
+    print(f"⚠️ Error loading Credit Score Model: {e}")
 
 
 def predict_credit(data):
+
+    if model is None:
+        raise Exception(
+            "Credit Score model is not available on this server."
+        )
 
     input_df = pd.DataFrame([data])
 
