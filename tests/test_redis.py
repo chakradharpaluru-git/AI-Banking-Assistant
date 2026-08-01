@@ -1,5 +1,13 @@
-from backend.cache.redis_client import redis_client
+import os
+import redis
+from dotenv import load_dotenv
 
-redis_client.set("bank_name", "AI Banking Assistant")
+load_dotenv()
 
-print(redis_client.get("bank_name"))
+client = redis.from_url(
+    os.getenv("REDIS_URL"),
+    decode_responses=True
+)
+
+client.set("bank_name", "AI Banking Assistant")
+print(client.get("bank_name"))
