@@ -1,157 +1,274 @@
 import requests
 
 
-BASE_URL = "http://127.0.0.1:8000"
+# =====================================================
+# BACKEND URL
+# =====================================================
+
+BASE_URL = "https://ai-banking-assistant-39vn.onrender.com"
 
 
 
-# =========================
-# LOGIN
-# =========================
+# =====================================================
+# COMMON REQUEST HANDLER
+# =====================================================
+
+def post_request(endpoint, payload):
+
+    try:
+
+        response = requests.post(
+
+            f"{BASE_URL}{endpoint}",
+
+            json=payload,
+
+            timeout=120
+
+        )
 
 
-def login_user(data):
+        print("API:", endpoint)
+
+        print("STATUS:", response.status_code)
+
+        print("BODY:", response.text)
 
 
-    response = requests.post(
 
-        f"{BASE_URL}/auth/login",
+        if response.status_code == 200:
 
-        json=data
+            return response.json()
+
+
+        return {
+
+            "error": response.text,
+
+            "status_code": response.status_code
+
+        }
+
+
+    except requests.exceptions.Timeout:
+
+        return {
+
+            "error":
+            "Backend timeout. Render service may be waking up."
+
+        }
+
+
+    except requests.exceptions.ConnectionError:
+
+        return {
+
+            "error":
+            "Cannot connect to backend."
+
+        }
+
+
+    except Exception as e:
+
+        return {
+
+            "error": str(e)
+
+        }
+
+
+
+# =====================================================
+# AUTH
+# =====================================================
+
+
+def login_user(payload):
+
+    return post_request(
+
+        "/auth/login",
+
+        payload
 
     )
 
 
-    return response.json()
+
+def register_user(payload):
+
+    return post_request(
+
+        "/auth/register",
+
+        payload
+
+    )
 
 
 
-# =========================
+# =====================================================
 # LOAN
-# =========================
+# =====================================================
 
 
-def loan_prediction(data):
+def loan_predict(payload):
 
+    return post_request(
 
-    response=requests.post(
+        "/loan/predict",
 
-        f"{BASE_URL}/loan/predict",
-
-        json=data
+        payload
 
     )
 
 
-    return response.json()
 
-
-
-# =========================
+# =====================================================
 # FRAUD
-# =========================
+# =====================================================
 
 
-def fraud_prediction(data):
+def fraud_predict(payload):
 
+    return post_request(
 
-    response=requests.post(
+        "/fraud/predict",
 
-        f"{BASE_URL}/fraud/predict",
-
-        json=data
-
-    )
-
-
-    return response.json()
-
-
-
-# =========================
-# AGENT QUERY
-# =========================
-
-
-def agent_query(data):
-
-    response = requests.post(
-        f"{BASE_URL}/agents/query",
-        json=data
-    )
-
-    print("Status Code:", response.status_code)
-    print("Response:", response.text)
-
-    return response.json()
-
-
-
-# =========================
-# COMPLAINT
-# =========================
-
-
-def complaint_classify(data):
-
-
-    response=requests.post(
-
-        f"{BASE_URL}/complaint/classify",
-
-        json=data
+        payload
 
     )
 
 
-    return response.json()
+
+# =====================================================
+# CREDIT SCORE
+# =====================================================
 
 
+def credit_predict(payload):
 
-# =========================
-# POLICY CHATBOT
-# =========================
+    return post_request(
 
+        "/credit/predict",
 
-def policy_chat(data):
-
-
-    response=requests.post(
-
-        f"{BASE_URL}/chatbot/chat",
-
-        json=data
+        payload
 
     )
 
 
-    return response.json()
+
+# =====================================================
+# CUSTOMER SEGMENTATION
+# =====================================================
+
+
+def customer_segment(payload):
+
+    return post_request(
+
+        "/customer/segment",
+
+        payload
+
+    )
 
 
 
-# =========================
+# =====================================================
+# COMPLAINT CLASSIFICATION
+# =====================================================
+
+
+def complaint_classify(payload):
+
+    return post_request(
+
+        "/complaint/classify",
+
+        payload
+
+    )
+
+
+
+# =====================================================
+# POLICY RAG CHATBOT
+# =====================================================
+
+
+def policy_chat(payload):
+
+    return post_request(
+
+        "/chatbot/chat",
+
+        payload
+
+    )
+
+
+
+# =====================================================
+# LANGGRAPH MULTI AGENT
+# =====================================================
+
+
+def agent_query(payload):
+
+    return post_request(
+
+        "/agents/query",
+
+        payload
+
+    )
+
+
+
+# =====================================================
 # PROFILE
-# =========================
+# =====================================================
 
 
 def get_profile(token):
 
+    try:
 
-    headers={
+        response = requests.get(
 
-        "Authorization":
-        f"Bearer {token}"
+            f"{BASE_URL}/profile/",
 
-    }
+            headers={
+
+                "Authorization":
+                f"Bearer {token}"
+
+            },
+
+            timeout=60
+
+        )
 
 
-    response=requests.get(
+        if response.status_code == 200:
 
-        f"{BASE_URL}/profile/",
-
-        headers=headers
-
-    )
+            return response.json()
 
 
-    return response.json()
+        return {
+
+            "error": response.text
+
+        }
+
+
+    except Exception as e:
+
+        return {
+
+            "error": str(e)
+
+        }

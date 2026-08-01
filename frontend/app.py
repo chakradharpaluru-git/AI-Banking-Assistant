@@ -1,22 +1,25 @@
 import streamlit as st
+import requests
 import logging
 import os
 
 
 # =====================================================
-# PAGE CONFIG
+# CONFIG
 # =====================================================
 
 st.set_page_config(
     page_title="AI Banking Assistant",
     page_icon="🏦",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 
+BACKEND_URL = "https://ai-banking-assistant-39vn.onrender.com"
+
+
 # =====================================================
-# LOGGING SYSTEM
+# LOGGING
 # =====================================================
 
 LOG_DIR = "frontend/logs"
@@ -26,246 +29,664 @@ os.makedirs(
     exist_ok=True
 )
 
+
 logging.basicConfig(
     filename=f"{LOG_DIR}/banking_app.log",
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s"
+    level=logging.INFO
 )
+
 
 logger = logging.getLogger()
 
-logger.info(
-    "🏦 AI Banking Assistant Application Started"
-)
-
 
 # =====================================================
-# SESSION MANAGEMENT
+# SESSION
 # =====================================================
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
+
+if "token" not in st.session_state:
+    st.session_state.token = None
+
+
 if "username" not in st.session_state:
     st.session_state.username = "Guest"
 
-if "role" not in st.session_state:
-    st.session_state.role = "Customer"
 
 
 # =====================================================
 # HEADER
 # =====================================================
 
-st.markdown(
+st.title("🏦 AI Banking Assistant")
+
+st.write(
 """
-# 🏦 AI Banking Assistant
+### Intelligent Digital Banking Platform
 
-### 🤖 Intelligent Digital Banking Platform
-
-Secure • Smart • AI Powered
+Machine Learning + RAG + LangGraph Agents
 """
 )
 
+
 st.divider()
+
 
 
 # =====================================================
 # SIDEBAR
 # =====================================================
 
-st.sidebar.image(
-    "https://cdn-icons-png.flaticon.com/512/2830/2830284.png",
-    width=100
-)
 
 st.sidebar.title(
     "🏦 Banking Portal"
 )
 
-st.sidebar.markdown(
-f"""
-### 👤 User Profile
 
-**Name:** {st.session_state.username}
+page = st.sidebar.radio(
 
-**Role:** {st.session_state.role}
+    "Navigate",
 
-**Status:** 🟢 Active
-"""
+    [
+
+        "Dashboard",
+
+        "Register",
+
+        "Login",
+
+        "Loan Prediction",
+
+        "Fraud Detection",
+
+        "Credit Score",
+
+        "Customer Segmentation",
+
+        "Complaint Classification",
+
+        "RBI Policy Chatbot",
+
+        "AI Agent Assistant"
+
+    ]
+
 )
+
+
 
 st.sidebar.divider()
 
 
-# =====================================================
-# LOGIN STATUS
-# =====================================================
+st.sidebar.write(
+f"""
+👤 User:
 
-if st.session_state.logged_in:
-
-    st.sidebar.success("🔐 Logged In")
-
-    if st.sidebar.button("🚪 Logout"):
-
-        st.session_state.logged_in = False
-        st.session_state.username = "Guest"
-        st.session_state.role = "Customer"
-
-        st.rerun()
-
-else:
-
-    st.sidebar.warning("🔒 Login Required")
+{st.session_state.username}
 
 
-# =====================================================
-# SYSTEM MONITOR
-# =====================================================
+Status:
 
-st.sidebar.subheader("⚙️ System Monitor")
-
-status = [
-
-    ("🚀 FastAPI Backend", "🟢 Online"),
-
-    ("🧠 ML Models", "🟢 Loaded"),
-
-    ("🔎 RAG Engine", "🟢 Active"),
-
-    ("🕸 LangGraph Agents", "🟢 Running"),
-
-    ("🗄 Database", "🟢 Connected")
-
-]
-
-for name, state in status:
-
-    st.sidebar.write(f"{name} : {state}")
-
-
-# =====================================================
-# DASHBOARD CARDS
-# =====================================================
-
-st.subheader("🚀 AI Banking Services")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-
-    st.success(
+{"🟢 Logged In" if st.session_state.logged_in else "🔴 Guest"}
 """
-## 💰 Loan Prediction
+)
 
-AI model analyzes:
 
-✅ Income
 
-✅ Credit Score
+# =====================================================
+# API FUNCTION
+# =====================================================
 
-✅ Loan History
 
-Predict approval chances.
-"""
+def call_api(endpoint, payload):
+
+    try:
+
+        response = requests.post(
+
+            f"{BACKEND_URL}{endpoint}",
+
+            json=payload,
+
+            timeout=60
+
+        )
+
+
+        return response.json()
+
+
+    except Exception as e:
+
+        return {
+
+            "error":str(e)
+
+        }
+
+
+
+# =====================================================
+# DASHBOARD
+# =====================================================
+
+
+if page=="Dashboard":
+
+
+    st.subheader(
+        "🚀 AI Banking Services"
     )
 
-with col2:
 
-    st.error(
-"""
-## 🚨 Fraud Detection
+    c1,c2,c3 = st.columns(3)
 
-AI detects:
 
-⚠ Suspicious Transactions
+    with c1:
 
-⚠ Fraud Patterns
+        st.success(
+        """
+        ## 💰 Loan Prediction
 
-⚠ Risk Score
-"""
+        Predict loan approval using ML
+        """
+        )
+
+
+    with c2:
+
+        st.error(
+        """
+        ## 🚨 Fraud Detection
+
+        Detect suspicious transactions
+        """
+        )
+
+
+    with c3:
+
+        st.info(
+        """
+        ## 📚 RBI Policy Chatbot
+
+        Ask RBI banking questions
+        """
+        )
+
+
+
+# =====================================================
+# REGISTER
+# =====================================================
+
+
+elif page=="Register":
+
+
+    st.subheader(
+        "Create Account"
     )
 
-with col3:
+
+    username = st.text_input(
+        "Username"
+    )
+
+
+    email = st.text_input(
+        "Email"
+    )
+
+
+    password = st.text_input(
+        "Password",
+        type="password"
+    )
+
+
+    if st.button("Register"):
+
+
+        result = call_api(
+
+            "/auth/register",
+
+            {
+
+            "username":username,
+
+            "email":email,
+
+            "password":password
+
+            }
+
+        )
+
+
+        st.json(result)
+
+
+
+# =====================================================
+# LOGIN
+# =====================================================
+
+
+elif page=="Login":
+
+
+    st.subheader(
+        "Login"
+    )
+
+
+    username = st.text_input(
+        "Username"
+    )
+
+
+    password = st.text_input(
+        "Password",
+        type="password"
+    )
+
+
+    if st.button("Login"):
+
+
+        result = call_api(
+
+            "/auth/login",
+
+            {
+
+            "username":username,
+
+            "password":password
+
+            }
+
+        )
+
+
+        if "access_token" in result:
+
+
+            st.session_state.logged_in=True
+
+            st.session_state.token=result["access_token"]
+
+            st.session_state.username=username
+
+
+            st.success(
+                "Login Successful"
+            )
+
+
+        else:
+
+            st.error(result)
+
+
+
+# =====================================================
+# LOAN
+# =====================================================
+
+
+elif page=="Loan Prediction":
+
+
+    st.subheader(
+        "💰 Loan Eligibility"
+    )
+
+
+    payload={
+
+        "gender":"Male",
+
+        "married":"Yes",
+
+        "education":"Graduate",
+
+        "self_employed":"No",
+
+        "applicant_income":50000,
+
+        "coapplicant_income":10000,
+
+        "loan_amount":200000,
+
+        "loan_amount_term":360,
+
+        "credit_history":1,
+
+        "dependents_1":0,
+
+        "dependents_2":0,
+
+        "dependents_3_plus":0,
+
+        "property_area_semiurban":1,
+
+        "property_area_urban":0
+
+    }
+
+
+
+    if st.button("Predict Loan"):
+
+
+        result=call_api(
+
+            "/loan/predict",
+
+            payload
+
+        )
+
+
+        st.success(result)
+
+
+
+# =====================================================
+# FRAUD
+# =====================================================
+
+
+elif page=="Fraud Detection":
+
+
+    st.subheader(
+        "🚨 Fraud Detection"
+    )
+
+
+    payload={
+
+        "Time":100,
+
+        "V1":0,
+
+        "V2":0,
+
+        "V3":0,
+
+        "V4":0,
+
+        "V5":0,
+
+        "V6":0,
+
+        "V7":0,
+
+        "V8":0,
+
+        "V9":0,
+
+        "V10":0,
+
+        "V11":0,
+
+        "V12":0,
+
+        "V13":0,
+
+        "V14":0,
+
+        "V15":0,
+
+        "V16":0,
+
+        "V17":0,
+
+        "V18":0,
+
+        "V19":0,
+
+        "V20":0,
+
+        "V21":0,
+
+        "V22":0,
+
+        "V23":0,
+
+        "V24":0,
+
+        "V25":0,
+
+        "V26":0,
+
+        "V27":0,
+
+        "V28":0,
+
+        "Amount":2500
+
+    }
+
+
+
+    if st.button("Check Transaction"):
+
+
+        result=call_api(
+
+            "/fraud/predict",
+
+            payload
+
+        )
+
+
+        st.write(result)
+
+
+
+# =====================================================
+# CREDIT
+# =====================================================
+
+
+elif page=="Credit Score":
+
+
+    st.subheader(
+        "📊 Credit Score Prediction"
+    )
+
 
     st.info(
-"""
-## 📚 RBI Policy Assistant
-
-Ask questions about:
-
-📄 Banking Rules
-
-📄 Loan Policies
-
-📄 RBI Guidelines
-"""
+        "Uses trained credit score ML model"
     )
 
 
+
 # =====================================================
-# AI AGENTS STATUS
+# SEGMENTATION
 # =====================================================
 
-st.divider()
 
-st.subheader("🤖 Multi-Agent Banking AI")
+elif page=="Customer Segmentation":
 
-agents = [
 
-    ("👨‍💼 Supervisor Agent", "Routing Requests"),
-
-    ("💳 Loan Agent", "Loan Analysis"),
-
-    ("🚨 Fraud Agent", "Fraud Detection"),
-
-    ("📊 Credit Agent", "Credit Score"),
-
-    ("💰 Investment Agent", "Investment Advice"),
-
-    ("📞 Support Agent", "Customer Queries"),
-
-    ("📚 Policy Agent", "RBI Documents")
-
-]
-
-for agent, task in agents:
-
-    st.write(
-        f"""
-{agent}
-
-➜ {task}
-
-Status: 🟢 Running
-"""
+    st.subheader(
+        "👥 Customer Segment"
     )
+
+
+    result=call_api(
+
+        "/customer/segment",
+
+        {
+
+        "Monthly_Inhand_Salary":50000,
+
+        "Num_Bank_Accounts":2,
+
+        "Num_Credit_Card":2,
+
+        "Interest_Rate":8,
+
+        "Delay_from_due_date":0,
+
+        "Num_Credit_Inquiries":1,
+
+        "Credit_Utilization_Ratio":20,
+
+        "Total_EMI_per_month":5000
+
+        }
+
+    )
+
+
+    st.json(result)
+
+
+
+# =====================================================
+# COMPLAINT
+# =====================================================
+
+
+elif page=="Complaint Classification":
+
+
+    text=st.text_area(
+        "Enter complaint"
+    )
+
+
+    if st.button("Classify"):
+
+
+        result=call_api(
+
+            "/complaint/classify",
+
+            {
+
+            "text":text
+
+            }
+
+        )
+
+
+        st.json(result)
+
+
+
+# =====================================================
+# RAG CHATBOT
+# =====================================================
+
+
+elif page=="RBI Policy Chatbot":
+
+
+    question=st.text_input(
+        "Ask RBI Question"
+    )
+
+
+    if st.button("Ask"):
+
+
+        result=call_api(
+
+            "/chatbot/chat",
+
+            {
+
+            "question":question
+
+            }
+
+        )
+
+
+        st.write(
+            result.get(
+                "response"
+            )
+        )
+
+
+
+# =====================================================
+# LANGGRAPH AGENT
+# =====================================================
+
+
+elif page=="AI Agent Assistant":
+
+
+    message=st.text_input(
+        "Ask Banking AI Agent"
+    )
+
+
+    if st.button("Send"):
+
+
+        result=call_api(
+
+            "/agents/query",
+
+            {
+
+            "message":message
+
+            }
+
+        )
+
+
+        st.success(
+
+            result.get(
+                "agent"
+            )
+
+        )
+
+
+        st.write(
+
+            result.get(
+                "response"
+            )
+
+        )
+
 
 
 # =====================================================
 # FOOTER
 # =====================================================
 
+
 st.divider()
+
 
 st.caption(
 """
-🏦 AI Banking Assistant
+AI Banking Assistant v1.0
 
-Built With:
+Built with:
 
-🐍 Python
-
-⚡ Streamlit
-
-🚀 FastAPI
-
-🧠 Machine Learning
-
-🔎 RAG
-
-🕸 LangGraph
-
-Version: 1.0.0
+Python | FastAPI | Streamlit | ML | RAG | LangGraph
 """
 )
