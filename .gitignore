@@ -38,3 +38,23 @@ notebook/ml/models/
 # SQLite
 *.db
 *.sqlite3
+
+
+# ============================
+# Machine Learning Models
+# ============================
+
+models/*.pkl
+models/*.joblib
+
+# Production models to keep
+!models/loan_model.pkl
+!models/fraud_model.pkl
+!models/scaler.pkl
+!models/credit_scaler.pkl
+!models/credit_feature_names.pkl
+!models/credit_target_encoder.pkl
+!models/customer_scaler.pkl
+!models/customer_segmentation_model.pkl
+!models/complaint_classifier.pkl
+!models/tfidf_vectorizer.pkl
